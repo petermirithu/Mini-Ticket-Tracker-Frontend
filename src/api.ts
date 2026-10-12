@@ -17,6 +17,11 @@ export interface TicketPage {
   results: Ticket[]
 }
 
+export type CreateTicketInput = Pick<
+  Ticket,
+  'title' | 'description' | 'status' | 'priority'
+>
+
 const API_URL = (import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:8000').replace(
   /\/$/,
   '',
@@ -53,6 +58,13 @@ export function getTickets(status: TicketStatus | 'all', page: number, limit = 6
   const params = new URLSearchParams({ page: String(page), limit: String(limit) })
   if (status !== 'all') params.set('status', status)
   return request<TicketPage>(`/tickets?${params.toString()}`)
+}
+
+export function createTicket(ticket: CreateTicketInput) {
+  return request<Ticket>('/tickets', {
+    method: 'POST',
+    body: JSON.stringify(ticket),
+  })
 }
 
 export async function getAllTickets(): Promise<Ticket[]> {

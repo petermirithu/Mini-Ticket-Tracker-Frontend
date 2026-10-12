@@ -48,12 +48,46 @@ h1 {
   line-height: 1.5;
 }
 .section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
   margin-bottom: 16px;
 }
 
 .section-heading h2 {
   margin: 0;
   font-size: 24px;
+}
+
+.button {
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 5px;
+  color: #ffffff;
+  font: inherit;
+  font-weight: 700;
+  background: #1967d2;
+  cursor: pointer;
+}
+
+.button:hover {
+  background: #1557b0;
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.button-secondary {
+  border: 1px solid var(--border);
+  color: var(--text);
+  background: var(--surface);
+}
+
+.button-secondary:hover {
+  background: #f1f3f4;
 }
 .state-panel {
   display: flex;
@@ -166,6 +200,95 @@ h1 {
 .priority-high {
   color: #b3261e;
   font-weight: 700;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgb(0 0 0 / 45%);
+}
+
+.modal {
+  width: min(100%, 520px);
+  padding: 24px;
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 20%);
+}
+
+.modal-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.modal-heading h2 {
+  margin: 0;
+}
+
+.close-button {
+  padding: 4px 8px;
+  border: 0;
+  color: var(--muted);
+  font-size: 28px;
+  line-height: 1;
+  background: transparent;
+  cursor: pointer;
+}
+
+.modal form,
+.modal label {
+  display: grid;
+  gap: 8px;
+}
+
+.modal form {
+  gap: 18px;
+}
+
+.modal label {
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.modal input,
+.modal textarea,
+.modal select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--text);
+  font: inherit;
+  background: var(--surface);
+}
+
+.modal textarea {
+  resize: vertical;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-error {
+  margin: 0;
+  color: #b3261e;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
 }
 
 @media (max-width: 600px) {

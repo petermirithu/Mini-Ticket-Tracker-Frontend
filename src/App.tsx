@@ -1,11 +1,20 @@
-import { useEffect, useState } from 'react'
-import { getAllTickets, type Ticket } from './api'
+import { useEffect, useState, type FormEvent } from 'react'
+import {
+  createTicket,
+  getAllTickets,
+  type Ticket,
+  type TicketPriority,
+  type TicketStatus,
+} from './api'
 import './App.css'
 
 function App() {
   const [tickets, setTickets] = useState<Ticket[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isFormOpen, setIsFormOpen] = useState(false)
+  const [isCreating, setIsCreating] = useState(false)
+  const [formError, setFormError] = useState<string | null>(null)
 
   useEffect(() => {
     let isActive = true
@@ -28,6 +37,29 @@ function App() {
     }
   }, [])
 
+  async function handleCreateTicket(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    setIsCreating(true)
+    setFormError(null)
+
+    const form = new FormData(event.currentTarget)
+
+    try {
+      const ticket = await createTicket({
+        title: String(form.get('title')),
+        description: String(form.get('description')),
+        status: String(form.get('status')) as TicketStatus,
+        priority: String(form.get('priority')) as TicketPriority,
+      })
+      setTickets((current) => [ticket, ...current])
+      setIsFormOpen(false)
+    } catch (reason: unknown) {
+      setFormError(reason instanceof Error ? reason.message : 'Unable to create ticket.')
+    } finally {
+      setIsCreating(false)
+    }
+  }
+
   return (
     <div className="app-shell">
       <main id="main">
@@ -42,6 +74,9 @@ function App() {
               <p className="eyebrow">Queue</p>
               <h2 id="tickets-heading">All tickets</h2>
             </div>
+            <button className="button" type="button" onClick={() => setIsFormOpen(true)}>
+              New ticket
+            </button>
           </div>
 
           {isLoading && <div className="state-panel">Loading tickets…</div>}
@@ -102,6 +137,76 @@ function App() {
           )}
         </section>
       </main>
+
+      {isFormOpen && (
+        <div className="modal-backdrop" role="presentation">
+          <section
+            className="modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="create-ticket-heading"
+          >
+            <div className="modal-heading">
+              <h2 id="create-ticket-heading">Create ticket</h2>
+              <button
+                className="close-button"
+                type="button"
+                aria-label="Close"
+                onClick={() => setIsFormOpen(false)}
+              >
+                ×
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateTicket}>
+              <label>
+                Title
+                <input name="title" type="text" required maxLength={200} autoFocus />
+              </label>
+
+              <label>
+                Description
+                <textarea name="description" required rows={4} />
+              </label>
+
+              <div className="form-row">
+                <label>
+                  Status
+                  <select name="status" defaultValue="open">
+                    <option value="open">Open</option>
+                    <option value="in_progress">In progress</option>
+                    <option value="closed">Closed</option>
+                  </select>
+                </label>
+
+                <label>
+                  Priority
+                  <select name="priority" defaultValue="medium">
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                  </select>
+                </label>
+              </div>
+
+              {formError && <p className="form-error" role="alert">{formError}</p>}
+
+              <div className="form-actions">
+                <button
+                  className="button button-secondary"
+                  type="button"
+                  onClick={() => setIsFormOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button className="button" type="submit" disabled={isCreating}>
+                  {isCreating ? 'Creating…' : 'Create ticket'}
+                </button>
+              </div>
+            </form>
+          </section>
+        </div>
+      )}
     </div>
   )
 }
