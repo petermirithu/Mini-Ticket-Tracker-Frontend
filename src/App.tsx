@@ -9,8 +9,11 @@ import {
 } from './api'
 import './App.css'
 
+const PAGE_SIZE = 6
+
 function App() {
   const [tickets, setTickets] = useState<Ticket[]>([])
+  const [currentPage, setCurrentPage] = useState(1)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
@@ -71,6 +74,7 @@ function App() {
         priority: String(form.get('priority')) as TicketPriority,
       })
       setTickets((current) => [ticket, ...current])
+      setCurrentPage(1)
       setIsFormOpen(false)
     } catch (reason: unknown) {
       setFormError(reason instanceof Error ? reason.message : 'Unable to create ticket.')
@@ -78,6 +82,10 @@ function App() {
       setIsCreating(false)
     }
   }
+
+  const totalPages = Math.ceil(tickets.length / PAGE_SIZE)
+  const firstTicketIndex = (currentPage - 1) * PAGE_SIZE
+  const visibleTickets = tickets.slice(firstTicketIndex, firstTicketIndex + PAGE_SIZE)
 
   return (
     <div className="app-shell">
@@ -121,7 +129,8 @@ function App() {
           )}
 
           {!isLoading && !error && tickets.length > 0 && (
-            <div className="table-container">
+            <>
+              <div className="table-container">
               <table className="ticket-table">
                 <thead>
                   <tr>
@@ -133,7 +142,7 @@ function App() {
                   </tr>
                 </thead>
                 <tbody>
-                  {tickets.map((ticket) => (
+                  {visibleTickets.map((ticket) => (
                     <tr key={ticket.id}>
                       <td className="ticket-title">{ticket.title}</td>
                       <td>{ticket.description}</td>
@@ -169,6 +178,31 @@ function App() {
                 </tbody>
               </table>
             </div>
+
+              <nav className="pagination" aria-label="Ticket table pagination">
+                <p>
+                  Page {currentPage} of {totalPages} · {tickets.length} tickets
+                </p>
+                <div className="pagination-controls">
+                  <button
+                    className="button button-secondary"
+                    type="button"
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage((page) => page - 1)}
+                  >
+                    Previous
+                  </button>
+                  <button
+                    className="button button-secondary"
+                    type="button"
+                    disabled={currentPage === totalPages}
+                    onClick={() => setCurrentPage((page) => page + 1)}
+                  >
+                    Next
+                  </button>
+                </div>
+              </nav>
+            </>
           )}
         </section>
       </main>
