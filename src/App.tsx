@@ -2,9 +2,11 @@ import { useEffect, useState, type FormEvent } from 'react'
 import {
   createTicket,
   getAllTickets,
+  getTicketStats,
   updateTicketStatus,
   type Ticket,
   type TicketPriority,
+  type TicketStats,
   type TicketStatus,
 } from './api'
 import './App.css'
@@ -13,6 +15,7 @@ const PAGE_SIZE = 6
 
 function App() {
   const [tickets, setTickets] = useState<Ticket[]>([])
+  const [stats, setStats] = useState<TicketStats | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -25,9 +28,12 @@ function App() {
   useEffect(() => {
     let isActive = true
 
-    getAllTickets()
-      .then((result) => {
-        if (isActive) setTickets(result)
+    Promise.all([getAllTickets(), getTicketStats()])
+      .then(([ticketResult, statsResult]) => {
+        if (isActive) {
+          setTickets(ticketResult)
+          setStats(statsResult)
+        }
       })
       .catch((reason: unknown) => {
         if (isActive) {
@@ -44,6 +50,7 @@ function App() {
   }, [])
 
   async function handleStatusChange(id: number, status: TicketStatus) {
+    const previousStatus = tickets.find((ticket) => ticket.id === id)?.status
     setUpdatingTicketId(id)
     setUpdateError(null)
 
@@ -52,6 +59,17 @@ function App() {
       setTickets((current) =>
         current.map((ticket) => (ticket.id === id ? updatedTicket : ticket)),
       )
+      if (previousStatus && previousStatus !== updatedTicket.status) {
+        setStats((current) =>
+          current
+            ? {
+                ...current,
+                [previousStatus]: current[previousStatus] - 1,
+                [updatedTicket.status]: current[updatedTicket.status] + 1,
+              }
+            : current,
+        )
+      }
     } catch (reason: unknown) {
       setUpdateError(reason instanceof Error ? reason.message : 'Unable to update status.')
     } finally {
@@ -74,6 +92,9 @@ function App() {
         priority: String(form.get('priority')) as TicketPriority,
       })
       setTickets((current) => [ticket, ...current])
+      setStats((current) =>
+        current ? { ...current, [ticket.status]: current[ticket.status] + 1 } : current,
+      )
       setCurrentPage(1)
       setIsFormOpen(false)
     } catch (reason: unknown) {
@@ -93,6 +114,21 @@ function App() {
         <section className="hero-section">
           <h1>Tickets</h1>
           <p className="hero-copy">Review and manage support tickets.</p>
+        </section>
+
+        <section className="stats-grid" aria-label="Ticket status summary">
+          <article className="stat-card stat-open">
+            <p>Open</p>
+            <strong>{stats?.open ?? '—'}</strong>
+          </article>
+          <article className="stat-card stat-in-progress">
+            <p>In progress</p>
+            <strong>{stats?.in_progress ?? '—'}</strong>
+          </article>
+          <article className="stat-card stat-closed">
+            <p>Closed</p>
+            <strong>{stats?.closed ?? '—'}</strong>
+          </article>
         </section>
 
         <section aria-labelledby="tickets-heading">

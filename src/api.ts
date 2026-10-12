@@ -17,6 +17,8 @@ export interface TicketPage {
   results: Ticket[]
 }
 
+export type TicketStats = Record<TicketStatus, number>
+
 export type CreateTicketInput = Pick<
   Ticket,
   'title' | 'description' | 'status' | 'priority'
@@ -58,6 +60,10 @@ export function getTickets(status: TicketStatus | 'all', page: number, limit = 6
   const params = new URLSearchParams({ page: String(page), limit: String(limit) })
   if (status !== 'all') params.set('status', status)
   return request<TicketPage>(`/tickets?${params.toString()}`)
+}
+
+export function getTicketStats() {
+  return request<TicketStats>('/tickets/stats')
 }
 
 export function createTicket(ticket: CreateTicketInput) {

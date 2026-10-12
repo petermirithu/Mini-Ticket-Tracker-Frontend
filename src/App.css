@@ -18,7 +18,42 @@ main {
 }
 
 .hero-section {
+  margin-bottom: 32px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
   margin-bottom: 40px;
+}
+
+.stat-card {
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-top: 4px solid #1967d2;
+  border-radius: 6px;
+  background: var(--surface);
+}
+
+.stat-card p {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.stat-card strong {
+  color: var(--text);
+  font-size: 32px;
+}
+
+.stat-in-progress {
+  border-top-color: #b06000;
+}
+
+.stat-closed {
+  border-top-color: #137333;
 }
 
 .eyebrow {
@@ -329,6 +364,10 @@ h1 {
 @media (max-width: 600px) {
   main {
     padding: 32px 16px 48px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
   }
 
   .pagination {
