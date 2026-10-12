@@ -121,6 +121,11 @@ h1 {
   color: #b3261e;
 }
 
+.update-error {
+  margin: 0 0 12px;
+  color: #b3261e;
+}
+
 .table-container {
   overflow-x: auto;
   border: 1px solid var(--border);
@@ -174,12 +179,23 @@ h1 {
   font-size: 13px;
 }
 
-.status-badge {
+.status-select {
   padding: 4px 8px;
   border-radius: 999px;
   font-weight: 700;
   background: #e8f0fe;
   color: #1967d2;
+}
+
+.status-select {
+  border: 1px solid currentColor;
+  font: inherit;
+  cursor: pointer;
+}
+
+.status-select:disabled {
+  opacity: 0.6;
+  cursor: wait;
 }
 
 .status-in_progress {

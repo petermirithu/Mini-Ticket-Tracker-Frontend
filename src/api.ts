@@ -67,6 +67,13 @@ export function createTicket(ticket: CreateTicketInput) {
   })
 }
 
+export function updateTicketStatus(id: number, status: TicketStatus) {
+  return request<Ticket>(`/tickets/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status }),
+  })
+}
+
 export async function getAllTickets(): Promise<Ticket[]> {
   const tickets: Ticket[] = []
   let page = 1

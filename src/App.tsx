@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react'
 import {
   createTicket,
   getAllTickets,
+  updateTicketStatus,
   type Ticket,
   type TicketPriority,
   type TicketStatus,
@@ -15,6 +16,8 @@ function App() {
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [isCreating, setIsCreating] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
+  const [updatingTicketId, setUpdatingTicketId] = useState<number | null>(null)
+  const [updateError, setUpdateError] = useState<string | null>(null)
 
   useEffect(() => {
     let isActive = true
@@ -36,6 +39,22 @@ function App() {
       isActive = false
     }
   }, [])
+
+  async function handleStatusChange(id: number, status: TicketStatus) {
+    setUpdatingTicketId(id)
+    setUpdateError(null)
+
+    try {
+      const updatedTicket = await updateTicketStatus(id, status)
+      setTickets((current) =>
+        current.map((ticket) => (ticket.id === id ? updatedTicket : ticket)),
+      )
+    } catch (reason: unknown) {
+      setUpdateError(reason instanceof Error ? reason.message : 'Unable to update status.')
+    } finally {
+      setUpdatingTicketId(null)
+    }
+  }
 
   async function handleCreateTicket(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -95,6 +114,12 @@ function App() {
             </div>
           )}
 
+          {updateError && (
+            <p className="update-error" role="alert">
+              {updateError}
+            </p>
+          )}
+
           {!isLoading && !error && tickets.length > 0 && (
             <div className="table-container">
               <table className="ticket-table">
@@ -113,9 +138,19 @@ function App() {
                       <td className="ticket-title">{ticket.title}</td>
                       <td>{ticket.description}</td>
                       <td>
-                        <span className={`status-badge status-${ticket.status}`}>
-                          {ticket.status.replace('_', ' ')}
-                        </span>
+                        <select
+                          className={`status-select status-${ticket.status}`}
+                          value={ticket.status}
+                          disabled={updatingTicketId === ticket.id}
+                          aria-label={`Status for ${ticket.title}`}
+                          onChange={(event) =>
+                            handleStatusChange(ticket.id, event.target.value as TicketStatus)
+                          }
+                        >
+                          <option value="open">Open</option>
+                          <option value="in_progress">In progress</option>
+                          <option value="closed">Closed</option>
+                        </select>
                       </td>
                       <td>
                         <span className={`priority priority-${ticket.priority}`}>
