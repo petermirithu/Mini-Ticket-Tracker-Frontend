@@ -2,24 +2,48 @@
 
 React, TypeScript, and Vite frontend for viewing and managing support tickets.
 
+## Requirements
+
+- Git
+- Node.js and npm
+- The Mini Ticket Tracker backend running on port `8000`
+
 ## Setup
 
-Start the Django backend on port `8000`, then install and run the frontend:
+These commands work in macOS, Linux, Windows PowerShell, and Windows Command Prompt.
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/petermirithu/Mini-Ticket-Tracker-Frontend.git
+cd Mini-Ticket-Tracker-Frontend
+```
+
+### 2. Install dependencies
 
 ```bash
 npm install
-npm run dev
 ```
 
-Open `http://localhost:5173`.
+### 3. Configure the backend URL
 
-The frontend uses `http://127.0.0.1:8000` by default. To use another backend address, add it to `.env`:
+The frontend uses `http://127.0.0.1:8000` by default. If the backend uses another address, create a `.env` file in the project root:
 
 ```dotenv
 VITE_API_URL=http://127.0.0.1:8000
 ```
 
 The backend must allow `http://localhost:5173` through its CORS configuration.
+
+### 4. Start the frontend
+
+Ensure the Django backend is running, then run:
+
+```bash
+npm run dev
+```
+
+Open `http://localhost:5173`.
 
 ## Screenshot
 
